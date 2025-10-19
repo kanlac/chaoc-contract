@@ -51,7 +51,7 @@
   ```
 - `ReputationBadge` 存储 `badgeId => ruleId`、`account => badgeIds`。
 - 使用位图或 `mapping(address => mapping(uint256 => bool))` 避免重复颁发。
-- `Marketplace` 维护 `mapping(bytes32 => Work)`（作品基元）、`mapping(address => BuyerStat)`、`mapping(address => CreatorStat)`（买家/创作者累计数据）、`mapping(bytes32 => bool)`（`purchaseId` 去重）等状态，并作为唯一写入 `ReputationDataFeed` 的合约。同时维护 `address[] creatorRegistry`（可分页枚举），便于链上遍历。
+- `Marketplace` 维护 `mapping(bytes32 => Work)`（作品基元）、`mapping(address => BuyerStat)`、`mapping(address => CreatorStat)`（买家/创作者累计数据）、`mapping(bytes32 => bool)`（`purchaseId` 去重）等状态，并作为唯一写入 `ReputationDataFeed` 的合约。同时维护 `address[] creatorRegistry`（可分页枚举），便于链上遍历。`Work` 采用懒发布（Lazy Listing）模式：创作者离线签名作品数据，链上验签登记。
 - 事件：`IdentityMinted`, `BadgeRuleCreated`, `BadgeIssued(account, ruleId, badgeId)`。
 
 ## 6. 徽章规则
@@ -69,11 +69,11 @@
 ## 7. 流程设计
 ### 7.1 身份注册
 1. 用户首次交互时可主动调用 `IdentityToken.mintSelf()`。
-2. 若在 `Marketplace.purchase` 前尚未铸造身份 NFT，合约会自动代表买家调用 `IdentityToken.issueTo(buyer)`（或等价内部方法）完成铸造。
+2. 若在 `Marketplace.purchase` 前尚未铸造身份 NFT，合约会自动代表买家调用 `IdentityToken.attest(buyer, metadataURI)`（或等价封装函数）完成铸造。
 3. 身份 `tokenId` 一经生成即与地址绑定，无法转移。
 
 ### 7.2 被动徽章（交易触发）
-1. 买家调用 `Marketplace.purchase(workId, price)` 完成 USDT 结算；若买家尚无身份 NFT，流程开头会自动铸造。
+1. 买家调用 `Marketplace.purchase(workId, price)` 完成 USDT 结算；若买家尚无身份 NFT，流程开头会自动通过 `IdentityToken.attest` 铸造。
 2. `Marketplace` 核对价格、执行 `USDT` 转账，并更新链上累计数据（次数、成交额），同时向 `ReputationDataFeed` 同步最新统计。
 3. 合约内部调用 `ReputationController._handlePurchase(buyer, creator, amount, purchaseId)`。
 4. `_handlePurchase` 基于最新累计数据判断是否满足规则 ID 1-5，合格时铸造徽章并记录状态，随后发出 `BadgeIssued` 事件。
@@ -119,7 +119,7 @@ abstract contract ReputationController {
 }
 
 contract Marketplace is ReputationController, AccessControl {
-    function listWork(bytes32 workId, uint256 price) external;
+    function listWork(bytes32 workId, Listing calldata listing, bytes calldata signature) external;
     function purchase(bytes32 workId, uint256 price) external;
     function getEligibleRules(address account, BadgeTarget target) external view returns (uint256[] memory);
     function issueMonthlyBadges(uint256 ruleId, uint256 startIndex, uint256 batchSize) external onlyRole(OPERATOR);
@@ -128,9 +128,9 @@ contract Marketplace is ReputationController, AccessControl {
 }
 ```
 
-- `listWork` 允许创作者登记作品，内部维护 `Work` 结构（`creator`、`price`、`active`、累计销量）；价格统一以 USDT（6 位精度）计价。
+- `listWork` 接收创作者离线签名（EIP-712），签名包含 `workId`、`price`、`nonce` 等不可变字段；合约验签后登记 `Work` 结构（`creator`、`price`、`active`、累计销量）。`nonce` 防止女巫攻击/重放；作品一旦上架即视为定价固定，如需调整需 `deactivate` 后重新上架。
 - `purchaseId` 用于去重；由 `Marketplace` 在成功结算后写入。
-- `purchase` 仅支持 USDT 结算，在入场时自动铸造身份 NFT（若尚未存在），随后更新 `BuyerStat`/`CreatorStat`、同步 `ReputationDataFeed`，并调用 `_handlePurchase`。
+- `purchase` 仅支持 USDT 结算，在入场时自动调用 `IdentityToken.attest` 为买家铸造身份 NFT（若尚未存在），随后更新 `BuyerStat`/`CreatorStat`、同步 `ReputationDataFeed`，并调用 `_handlePurchase`。交易前将 `price` 与已登记的 `Work` 数据对比，确保与签名一致。
 - `getEligibleRules` 对外只读查询，内部复用 `_eligibleRules` 计算逻辑。
 - `issueMonthlyBadges` 采用链上分页遍历，消除对外部 `accounts[]` 名单的依赖；第二阶段可切换到 Merkle 证明接口。
 
