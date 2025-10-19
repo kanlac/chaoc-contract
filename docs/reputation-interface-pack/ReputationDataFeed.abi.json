@@ -1,0 +1,251 @@
+[
+  {
+    "type": "function",
+    "name": "syncBuyerStat",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      {
+        "name": "account",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "stat",
+        "type": "tuple",
+        "internalType": "struct ReputationDataFeed.BuyerStat",
+        "components": [
+          {
+            "name": "totalPurchases",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "totalSpend",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "lastPurchaseAt",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "syncCreatorStat",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      {
+        "name": "account",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "stat",
+        "type": "tuple",
+        "internalType": "struct ReputationDataFeed.CreatorStat",
+        "components": [
+          {
+            "name": "totalSales",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "totalVolume",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "lastSaleAt",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "getBuyerStat",
+    "stateMutability": "view",
+    "inputs": [
+      {
+        "name": "account",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "internalType": "struct ReputationDataFeed.BuyerStat",
+        "components": [
+          {
+            "name": "totalPurchases",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "totalSpend",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "lastPurchaseAt",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "getCreatorStat",
+    "stateMutability": "view",
+    "inputs": [
+      {
+        "name": "account",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "internalType": "struct ReputationDataFeed.CreatorStat",
+        "components": [
+          {
+            "name": "totalSales",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "totalVolume",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "lastSaleAt",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "setMarketplace",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      {
+        "name": "marketplace",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "marketplace",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "supportsInterface",
+    "stateMutability": "view",
+    "inputs": [
+      {
+        "name": "interfaceId",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "BuyerStatSynced",
+    "inputs": [
+      {
+        "name": "account",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "totalPurchases",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "totalSpend",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "lastPurchaseAt",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "CreatorStatSynced",
+    "inputs": [
+      {
+        "name": "account",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "totalSales",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "totalVolume",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "lastSaleAt",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ]
+  }
+]

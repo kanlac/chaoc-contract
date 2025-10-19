@@ -1,0 +1,302 @@
+[
+  {
+    "type": "function",
+    "name": "createRule",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      {
+        "name": "rule",
+        "type": "tuple",
+        "internalType": "struct BadgeRuleRegistry.BadgeRuleInput",
+        "components": [
+          {
+            "name": "trigger",
+            "type": "uint8",
+            "internalType": "enum TriggerType"
+          },
+          {
+            "name": "target",
+            "type": "uint8",
+            "internalType": "enum BadgeTarget"
+          },
+          {
+            "name": "threshold",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "metadataURI",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "enabled",
+            "type": "bool",
+            "internalType": "bool"
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "name": "ruleId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "updateRule",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      {
+        "name": "ruleId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "update",
+        "type": "tuple",
+        "internalType": "struct BadgeRuleRegistry.BadgeRuleUpdate",
+        "components": [
+          {
+            "name": "threshold",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "metadataURI",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "enabled",
+            "type": "bool",
+            "internalType": "bool"
+          }
+        ]
+      }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "setRuleStatus",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      {
+        "name": "ruleId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "enabled",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "getRule",
+    "stateMutability": "view",
+    "inputs": [
+      {
+        "name": "ruleId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "internalType": "struct BadgeRuleRegistry.BadgeRule",
+        "components": [
+          {
+            "name": "ruleId",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "trigger",
+            "type": "uint8",
+            "internalType": "enum TriggerType"
+          },
+          {
+            "name": "target",
+            "type": "uint8",
+            "internalType": "enum BadgeTarget"
+          },
+          {
+            "name": "threshold",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "metadataURI",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "enabled",
+            "type": "bool",
+            "internalType": "bool"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "getRules",
+    "stateMutability": "view",
+    "inputs": [
+      {
+        "name": "offset",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "limit",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple[]",
+        "internalType": "struct BadgeRuleRegistry.BadgeRule[]",
+        "components": [
+          {
+            "name": "ruleId",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "trigger",
+            "type": "uint8",
+            "internalType": "enum TriggerType"
+          },
+          {
+            "name": "target",
+            "type": "uint8",
+            "internalType": "enum BadgeTarget"
+          },
+          {
+            "name": "threshold",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "metadataURI",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "enabled",
+            "type": "bool",
+            "internalType": "bool"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "ruleCount",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "ruleExists",
+    "stateMutability": "view",
+    "inputs": [
+      {
+        "name": "ruleId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "BadgeRuleCreated",
+    "inputs": [
+      {
+        "name": "ruleId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "trigger",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "enum TriggerType"
+      },
+      {
+        "name": "target",
+        "type": "uint8",
+        "indexed": false,
+        "internalType": "enum BadgeTarget"
+      },
+      {
+        "name": "threshold",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "metadataURI",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "name": "BadgeRuleUpdated",
+    "inputs": [
+      {
+        "name": "ruleId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "threshold",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "enabled",
+        "type": "bool",
+        "indexed": false,
+        "internalType": "bool"
+      }
+    ]
+  }
+]

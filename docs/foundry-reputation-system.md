@@ -32,7 +32,7 @@
 | `BadgeRuleRegistry` | 链上存储徽章规则（阈值、触发类型、权重等）。部署时写入，可后续扩展。 |
 | `ReputationController` (abstract) | 提供内部函数 `_handlePurchase`、`_issueBadges`，供继承合约内部调用。 |
 | `Marketplace` | 作品上架、购买与结算的入口合约，是唯一暴露 `external` 接口的模块。内部调用 `_handlePurchase` 触发声誉逻辑，并写入链上统计。 |
-| `ReputationDataFeed` (可选) | 接收 `Marketplace` 写入的累计数据，为主动徽章或外部查询提供聚合接口。 |
+| `ReputationDataFeed` | 接收 `Marketplace` 写入的累计数据，为主动徽章或外部查询提供聚合接口。 |
 
 > 说明：若交易功能由既有市场合约承担，可通过接口回调或事件监听调用 `ReputationController`。
 
