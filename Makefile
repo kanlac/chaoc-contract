@@ -39,7 +39,7 @@ clean:
 deps:
 	@git submodule update --init --recursive
 
-deploy-sepolia:
+deploy-sepolia: test-unit test-marketplace build
 	@if [ -f .env ]; then set -a && . .env && set +a; fi; \
 	if [ -z "$$SEPOLIA_RPC_URL" ]; then echo "SEPOLIA_RPC_URL is not set"; exit 1; fi; \
 	if [ -z "$$PRIVATE_KEY" ]; then echo "PRIVATE_KEY is not set"; exit 1; fi; \

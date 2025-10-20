@@ -1,5 +1,5 @@
-/out/
-/cache/
+out/
+cache/
 *.tsbuildinfo
 .DS_Store
 lib/
