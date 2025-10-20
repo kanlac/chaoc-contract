@@ -32,3 +32,8 @@ Scripts are executed with `forge script` and rely on standard Foundry environmen
     --rpc-url $RPC_URL \
     --broadcast
   ```
+- `BadgeQuery.s.sol` – reads the reputation badge SBTs owned by a given account. Required variables: `BADGE_ADDRESS`, `USER_ADDRESS`. Example:
+  ```bash
+  forge script packages/contracts/script/BadgeQuery.s.sol:BadgeQuery \
+    --rpc-url $RPC_URL
+  ```
