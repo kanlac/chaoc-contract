@@ -27,6 +27,11 @@ fmt:
 
 build:
 	@$(FORGE) build
+	@$(FORGE) inspect contracts/IdentityToken.sol:IdentityToken abi --json > docs/reputation-interface-pack/IdentityToken.abi.json
+	@$(FORGE) inspect contracts/ReputationBadge.sol:ReputationBadge abi --json > docs/reputation-interface-pack/ReputationBadge.abi.json
+	@$(FORGE) inspect contracts/BadgeRuleRegistry.sol:BadgeRuleRegistry abi --json > docs/reputation-interface-pack/BadgeRuleRegistry.abi.json
+	@$(FORGE) inspect contracts/Marketplace.sol:Marketplace abi --json > docs/reputation-interface-pack/Marketplace.abi.json
+	@$(FORGE) inspect contracts/ReputationDataFeed.sol:ReputationDataFeed abi --json > docs/reputation-interface-pack/ReputationDataFeed.abi.json
 
 clean:
 	@$(FORGE) clean
