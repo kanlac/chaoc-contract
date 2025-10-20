@@ -26,3 +26,9 @@ Scripts are executed with `forge script` and rely on standard Foundry environmen
     --rpc-url $RPC_URL \
     --broadcast
   ```
+- `PurchaseDebug.s.sol` – replays a purchase flow and prints post-trade identity/badge status for the buyer. Required variables: `MARKETPLACE_ADDRESS`, `BUYER_PRIVATE_KEY`, `WORK_SLUG`; optional `MINT_BUFFER` (extra settlement tokens to mint) and `SKIP_MINT` (set to `true` if buyer already holds tokens). Example:
+  ```bash
+  forge script packages/contracts/script/PurchaseDebug.s.sol:PurchaseDebug \
+    --rpc-url $RPC_URL \
+    --broadcast
+  ```
