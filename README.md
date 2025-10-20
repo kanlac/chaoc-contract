@@ -32,7 +32,7 @@
 - **关键模块**：
   - 前端：Next.js Web 客户端（计划放置于 `apps/web`，负责身份绑定、徽章陈列与交易入口）
   - 后端：Node.js BFF 与定时任务（`apps/api` 预留，负责作品验签、批量颁发脚本）
-  - 合约：Foundry 构建的 Solidity 套件（身份、徽章、规则、市场、数据源）
+  - 合约：Foundry 构建的 Solidity 套件（身份、徽章、规则、市场、数据源）[《链上声誉系统开发说明》](docs/foundry-reputation-system.md)
   - 其他：后续将接入 The Graph 子图、AI 辅助的内容审核与推荐
 - **依赖与技术栈**：
   - 前端：React 18, Next.js, wagmi/ethers.js, Tailwind CSS（计划中）

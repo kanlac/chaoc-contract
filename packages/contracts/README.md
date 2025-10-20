@@ -37,3 +37,9 @@ Scripts are executed with `forge script` and rely on standard Foundry environmen
   forge script packages/contracts/script/BadgeQuery.s.sol:BadgeQuery \
     --rpc-url $RPC_URL
   ```
+- `AddPassiveBadgeRules.s.sol` – submits remaining passive badge rules (IDs 2-5) to an existing registry if missing. Required variable: `BADGE_RULE_REGISTRY_ADDRESS`; optional `REGISTRY_OWNER_PRIVATE_KEY` (otherwise rely on `--private-key`). Example:
+  ```bash
+  forge script packages/contracts/script/AddPassiveBadgeRules.s.sol:AddPassiveBadgeRules \
+    --rpc-url $RPC_URL \
+    --broadcast
+  ```
