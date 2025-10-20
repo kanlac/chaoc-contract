@@ -23,7 +23,7 @@
 - 事件：`BadgeMinted`, `BadgeRevoked`。
 
 ### BadgeRuleRegistry
-- 管理：`createRule(BadgeRuleInput)`, `updateRule(ruleId, BadgeRuleUpdate)`, `setRuleStatus(ruleId, enabled)`。
+- 管理：`createRule(BadgeRuleInput)`, `updateRule(ruleId, metadataURI)`, `setRuleStatus(ruleId, enabled)`。
 - 查询：`getRule`, `getRules(offset, limit)`, `ruleCount`, `ruleExists`。
 - 事件：`BadgeRuleCreated`, `BadgeRuleUpdated`。
 
@@ -32,7 +32,7 @@
 - 徽章评估：`getEligibleRules(account, target)`, `issueMonthlyBadges(ruleId, startIndex, batchSize)`。
 - 数据读取：`getWork`, `getBuyerStat`, `getCreatorStat`, `creatorRegistryLength`, `creatorAt`。
 - 配置：`setBadgeContract`, `setBadgeRuleRegistry`, `setDataFeed`，以及 `badgeContract`, `badgeRuleRegistry`, `dataFeed` 查询。
-- 权限：遵循 `AccessControl`，可用 `grantRole`, `revokeRole`, `renounceRole`, `hasRole`, `getRoleAdmin`。
+- 权限：采用标准 `Ownable` 模式，部署者（operator）可调用 `setBadgeContract`, `setBadgeRuleRegistry`, `setDataFeed`, `issueMonthlyBadges` 等管理函数。
 - 事件：`WorkListed`, `WorkDeactivated`, `PurchaseCompleted`, `BadgeIssued`。
 
 ### ReputationDataFeed
@@ -43,7 +43,8 @@
 
 ## 使用建议
 - **ABI 导入**：复制对应 JSON 到前端或脚本项目，以 `ethers.js` / `viem` / `web3.py` 等工具生成类型定义。
-- **角色权限**：部署后记录 `MARKET_ADMIN`、`OPERATOR`、`DATA_WRITER` 等角色地址，避免未授权的敏感调用。
+- **运营权限**：部署者地址即为唯一 `operator`，请妥善保管私钥或通过脚本托管执行敏感调用。
+- **规则变更**：`updateRule` 仅允许修改 `metadataURI`；若需调整阈值或触发条件，请创建新规则并通过 `setRuleStatus` 禁用旧规则。
 - **签名与安全**：`listWork` 调用需使用 EIP-712 数据结构；确保链外签名与链上验证字段一致。
 - **对齐实现**：当 Solidity 实现确定后，应以编译得到的 ABI 取代占位版本，防止参数或返回值不匹配。
 

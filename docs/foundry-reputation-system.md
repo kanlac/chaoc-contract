@@ -22,7 +22,7 @@
 - **用户 (Buyer)**：在平台上购买作品，可按交易次数获得徽章。
 - **创作者 (Creator)**：发布作品并完成交易，可获得销量相关徽章。
 - **协议合约**：负责身份 NFT/SBT 铸造、徽章规则存储与状态变更。
-- **运营脚本 (Operator)**：定期统计交易并主动调用合约颁发特定徽章。
+- **运营者 (Operator)**：由合约部署者承担，对应合约中的 `owner` 地址，可通过脚本定期统计交易并主动调用合约颁发徽章。
 
 ## 4. 合约模块划分
 | 合约 | 职责说明 |
@@ -53,6 +53,7 @@
 - 使用位图或 `mapping(address => mapping(uint256 => bool))` 避免重复颁发。
 - `Marketplace` 维护 `mapping(bytes32 => Work)`（作品基元）、`mapping(address => BuyerStat)`、`mapping(address => CreatorStat)`（买家/创作者累计数据）、`mapping(bytes32 => bool)`（`purchaseId` 去重）等状态，并作为唯一写入 `ReputationDataFeed` 的合约。同时维护 `address[] creatorRegistry`（可分页枚举），便于链上遍历。`Work` 采用懒发布（Lazy Listing）模式：创作者离线签名作品数据，链上验签登记。
 - 事件：`IdentityMinted`, `BadgeRuleCreated`, `BadgeIssued(account, ruleId, badgeId)`。
+- 规则一经创建仅允许更新 `metadataURI` 或启用状态，如需调整阈值或触发对象应通过新规则替代。
 
 ## 6. 徽章规则
 | 规则 ID | 触发类型 | 对象 | 条件 | 描述 |
@@ -118,19 +119,19 @@ abstract contract ReputationController {
     function _eligibleRules(address account, BadgeTarget target) internal view returns (uint256[] memory);
 }
 
-contract Marketplace is ReputationController, AccessControl {
+contract Marketplace is ReputationController, Ownable {
     function listWork(bytes32 workId, Listing calldata listing, bytes calldata signature) external;
     function deactivateWork(bytes32 workId) external;
     function purchase(bytes32 workId) external;
     function getEligibleRules(address account, BadgeTarget target) external view returns (uint256[] memory);
-    function issueMonthlyBadges(uint256 ruleId, uint256 startIndex, uint256 batchSize) external onlyRole(OPERATOR);
+    function issueMonthlyBadges(uint256 ruleId, uint256 startIndex, uint256 batchSize) external onlyOwner;
     // 第二阶段推荐新增：
     // function claimBadgeWithProof(uint256 ruleId, uint256 period, address account, bytes32[] calldata proof) external;
 }
 ```
 
 - `listWork` 接收创作者离线签名（EIP-712），签名包含 `workId`、`price`、`nonce` 等不可变字段；合约验签后登记 `Work` 结构（`creator`、`price`、`active`、累计销量）。`nonce` 防止女巫攻击/重放；作品一旦上架即视为定价固定，如需调整需调用 `deactivateWork` 后重新上架。
-- `deactivateWork` 由创作者或拥有 `MARKET_ADMIN` 角色的账户调用，将 `Work.active` 置为 `false`，禁止后续购买；同时可选择从 `creatorRegistry` 中保留记录以便统计历史绩效。
+- `deactivateWork` 由创作者或运营者（合约 `owner`）调用，将 `Work.active` 置为 `false`，禁止后续购买；同时可选择从 `creatorRegistry` 中保留记录以便统计历史绩效。
 - `purchaseId` 用于去重；由 `Marketplace` 在成功结算后写入。
 - `purchase` 仅支持 USDT 结算，在入场时自动调用 `IdentityToken.attest` 为买家铸造身份 NFT（若尚未存在），随后更新 `BuyerStat`/`CreatorStat`、同步 `ReputationDataFeed`，并调用 `_handlePurchase`。合约直接使用 `Work` 中登记的价格执行结算，调用方无需再传入 `price`。
 - `getEligibleRules` 对外只读查询，内部复用 `_eligibleRules` 计算逻辑。
@@ -146,7 +147,7 @@ contract Marketplace is ReputationController, AccessControl {
 - 对于时间敏感的徽章（如月度最佳创作者），建议预生成模板并在脚本发放前更新 URI。
 
 ## 12. 安全与治理
-- `Marketplace` 对外函数应具备基于 `Ownable` 或 `AccessControl` 的权限限制（如 `onlyRole(MARKET_ADMIN)`、`onlyRole(OPERATOR)`、`onlyRole(DATA_WRITER)`）。
+- `Marketplace` 暂采用单一运营者（`owner`）控制关键入口：`attest`、`issueBadge`、`issueMonthlyBadges`、配置更新等均由部署者脚本发起。后续若需要细分权限，可再引入多角色模块。
 - 防止重复颁发：使用 `badgeClaimed[account][ruleId]` 校验。
 - 防女巫：可加白名单或二次身份验证流程后再铸造身份 NFT。
 - 治理由多签钱包管理规则新增/禁用。

@@ -1,0 +1,6 @@
+/out/
+/cache/
+/broadcast/
+*.tsbuildinfo
+.DS_Store
+lib/

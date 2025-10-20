@@ -38,7 +38,7 @@
   script/
   ```
 - **配置文件**：在 `foundry.toml` 中开启 `ffi = true`（如需外部脚本）、`gas_reports = ["Marketplace", "IdentityToken"]` 帮助监测成本。
-- **测试账户**：统一使用 `setUp()` 中的地址别名：`buyer`, `creator`, `operator`, `admin` 等，便于阅读。
+- **测试账户**：统一使用 `setUp()` 中的地址别名：`buyer`, `creator`, `operator` 等，便于阅读（如需新增权限可再扩展）。
 
 ## 3. TDD 工作流
 1. **需求转测试**：从业务文档提炼单一职责（例如“首购用户自动获得身份 NFT”），写出 Given/When/Then。
@@ -53,7 +53,7 @@
 | --- | --- | --- | --- |
 | `IdentityToken` | `mintSelf` 自铸、`attest` 代铸、重复铸造禁止、不可转移 | `balanceOf`、`tokenIdOf`、事件 `IdentityMinted`、`transferFrom` 失败 | `test/identity/IdentityToken.t.sol` |
 | `ReputationBadge` | `issueBadge`、批量发放、重复领取拒绝、`badgeURI` 与规则映射 | `hasBadge` 状态、`BadgeMinted` 事件、权限控制 | `test/badge/ReputationBadge.t.sol` |
-| `BadgeRuleRegistry` | 创建/更新/禁用规则、分页查询 | `getRule` 返回值、`ruleCount`、启用标记 | `test/rules/BadgeRuleRegistry.t.sol` |
+| `BadgeRuleRegistry` | 创建/更新/禁用规则、分页查询 | `getRule` 返回值、`ruleCount`、启用标记（`updateRule` 仅改 `metadataURI`） | `test/rules/BadgeRuleRegistry.t.sol` |
 | `ReputationController` | `_handlePurchase` 累计数据、触发 `getEligibleRules` 内部逻辑、重复触发防护 | 内部统计结构、`badgeClaimed` 标记 | `test/controller/ReputationController.t.sol` |
 | `Marketplace` | `listWork` 验签与上架、`purchase` 结算、身份自动铸造、规则触发、事件顺序 | `PurchaseCompleted`、USDT 余额变化、数据写入 `ReputationDataFeed` | `test/marketplace/Marketplace_Purchase.t.sol` |
 | `ReputationDataFeed` | 同步买家/创作者数据、唯一写入方限制 | 仅允许 `Marketplace` 写入、查询保持一致 | `test/integration/Marketplace_IssueBadges.t.sol`（或独立单元测试） |
@@ -112,6 +112,12 @@ function test_BuyerCompletesFirstPurchase_MintsIdentityAndBadge() public {
 
 ## 9. 命令速查
 ```bash
+# 初始化/同步依赖
+make deps
+
+# 快速执行当前阶段的基础测试
+make test-unit
+
 # 全量测试与 gas 报告
 forge test --gas-report
 
