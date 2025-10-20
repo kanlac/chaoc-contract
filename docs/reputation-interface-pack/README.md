@@ -19,7 +19,7 @@
 
 ### ReputationBadge
 - 发放徽章：`issueBadge(account, ruleId)`, `issueBatch(ruleId, accounts)`。
-- 查询：`hasBadge`, `badgeURI`, `ruleIdOf`, `totalSupply`, `balanceOf`, `supportsInterface`。
+- 查询：`hasBadge`, `badgesOf(account)`（返回 `ruleIds` 与 `badgeIds`，便于前端展示），`badgeURI`, `ruleIdOf`, `totalSupply`, `balanceOf`, `supportsInterface`。
 - 事件：`BadgeMinted`, `BadgeRevoked`。
 
 ### BadgeRuleRegistry

@@ -73,6 +73,30 @@
   },
   {
     "type": "function",
+    "name": "badgesOf",
+    "stateMutability": "view",
+    "inputs": [
+      {
+        "name": "account",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "ruleIds",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "badgeIds",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      }
+    ]
+  },
+  {
+    "type": "function",
     "name": "badgeURI",
     "stateMutability": "view",
     "inputs": [
