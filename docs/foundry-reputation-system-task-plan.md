@@ -10,9 +10,9 @@
 
 ## 阶段 2：纵向切片与 Testnet 最小部署
 - **目标**：实现并验证单次购买→徽章颁发的纵向链路，并将最小功能部署到测试网（建议 Sepolia）。
-- **关键任务**：为 `Marketplace.purchase`、`ReputationController._handlePurchase` 写出失败用例（含首购自动铸造、重复 `purchaseId` 拒绝、事件顺序）；实现对应逻辑并补充 USDT Mock；完成 `forge script` 部署脚本用于在本地与测试网生成同构环境；将仅包含身份铸造与首枚徽章的版本部署至 Sepolia，记录地址与验证命令；在 `Makefile` 中增加 `make test-marketplace`、`make deploy-sepolia` 等目标简化测试与部署。
-- **验证方式**：`forge test --match-path test/marketplace/Marketplace_Purchase.t.sol` 通过；部署脚本在本地 `anvil` 和 Sepolia 均成功执行，部署记录写入 README；前端/脚本可调用测试网合约完成最小交互。
-- **可交付物**：纵向功能测试集、部署脚本与参数清单、Sepolia 合约地址与交互示例。
+- **关键任务**：为 `Marketplace.purchase`、`ReputationController._handlePurchase` 写出失败用例（含首购自动铸造、重复 `purchaseId` 拒绝、欢迎空投、事件顺序）；实现对应逻辑并补充自定义结算代币；完成 `forge script` 部署脚本用于在本地与测试网生成同构环境；将仅包含身份铸造与首枚徽章的版本部署至 Sepolia，记录地址与验证命令；在 `Makefile` 中增加 `make test-marketplace` 等目标简化测试与部署。
+- **验证方式**：`make test-marketplace` 通过；部署脚本在本地 `anvil` 和 Sepolia 均成功执行，部署记录写入 README 或发布说明；前端/脚本可调用测试网合约完成最小交互。
+- **可交付物**：纵向功能测试集、部署脚本与参数清单、测试网（或本地）部署演示、`Marketplace`/`ReputationDataFeed` ABI 与操作说明。
 
 ## 阶段 3：主动徽章与运营闭环
 - **目标**：扩展主动徽章流程并确保批量发放、防重复等复杂逻辑可测可回归。

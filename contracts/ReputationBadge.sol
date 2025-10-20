@@ -23,7 +23,11 @@ contract ReputationBadge is Ownable {
     error BadgeNotFound(uint256 badgeId);
     error Soulbound();
 
-    function issueBadge(address account, uint256 ruleId, string calldata metadataURI) external onlyOwner returns (uint256 badgeId) {
+    function issueBadge(address account, uint256 ruleId, string calldata metadataURI)
+        external
+        onlyOwner
+        returns (uint256 badgeId)
+    {
         require(account != address(0), "ReputationBadge: zero account");
         if (_hasBadgeByRule[account][ruleId]) revert BadgeAlreadyClaimed(ruleId);
 

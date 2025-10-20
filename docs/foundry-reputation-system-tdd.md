@@ -55,7 +55,7 @@
 | `ReputationBadge` | `issueBadge`、批量发放、重复领取拒绝、`badgeURI` 与规则映射 | `hasBadge` 状态、`BadgeMinted` 事件、权限控制 | `test/badge/ReputationBadge.t.sol` |
 | `BadgeRuleRegistry` | 创建/更新/禁用规则、分页查询 | `getRule` 返回值、`ruleCount`、启用标记（`updateRule` 仅改 `metadataURI`） | `test/rules/BadgeRuleRegistry.t.sol` |
 | `ReputationController` | `_handlePurchase` 累计数据、触发 `getEligibleRules` 内部逻辑、重复触发防护 | 内部统计结构、`badgeClaimed` 标记 | `test/controller/ReputationController.t.sol` |
-| `Marketplace` | `listWork` 验签与上架、`purchase` 结算、身份自动铸造、规则触发、事件顺序 | `PurchaseCompleted`、USDT 余额变化、数据写入 `ReputationDataFeed` | `test/marketplace/Marketplace_Purchase.t.sol` |
+| `Marketplace` | `listWork` 验签与上架、`purchase` 结算、身份自动铸造、欢迎空投、规则触发、事件顺序 | `PurchaseCompleted`、USDT 余额变化、空投一次性执行、数据写入 `ReputationDataFeed` | `test/marketplace/Marketplace_Purchase.t.sol` |
 | `ReputationDataFeed` | 同步买家/创作者数据、唯一写入方限制 | 仅允许 `Marketplace` 写入、查询保持一致 | `test/integration/Marketplace_IssueBadges.t.sol`（或独立单元测试） |
 
 > 若 `Marketplace` 依赖外部 USDT，请在测试中使用 `ERC20Mock` 并注入初始余额。
@@ -118,11 +118,11 @@ make deps
 # 快速执行当前阶段的基础测试
 make test-unit
 
+# 仅运行 Marketplace 测试
+make test-marketplace
+
 # 全量测试与 gas 报告
 forge test --gas-report
-
-# 仅运行 Marketplace 测试
-forge test --match-path test/marketplace/Marketplace_Purchase.t.sol
 
 # 检查覆盖率并输出 lcov
 forge coverage --report lcov

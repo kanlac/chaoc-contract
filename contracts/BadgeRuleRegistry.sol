@@ -38,8 +38,17 @@ contract BadgeRuleRegistry is Ownable {
     error RuleAlreadyExists(uint256 ruleId);
     error RuleNotFound(uint256 ruleId);
 
-    event BadgeRuleCreated(uint256 indexed ruleId, TriggerType trigger, BadgeTarget target, uint256 threshold, string metadataURI, bool enabled);
-    event BadgeRuleUpdated(uint256 indexed ruleId, TriggerType trigger, BadgeTarget target, uint256 threshold, string metadataURI);
+    event BadgeRuleCreated(
+        uint256 indexed ruleId,
+        TriggerType trigger,
+        BadgeTarget target,
+        uint256 threshold,
+        string metadataURI,
+        bool enabled
+    );
+    event BadgeRuleUpdated(
+        uint256 indexed ruleId, TriggerType trigger, BadgeTarget target, uint256 threshold, string metadataURI
+    );
     event BadgeRuleStatusChanged(uint256 indexed ruleId, bool enabled);
 
     function createRule(BadgeRuleInput calldata input) external onlyOwner {
@@ -56,7 +65,9 @@ contract BadgeRuleRegistry is Ownable {
 
         _ruleIds.push(input.ruleId);
 
-        emit BadgeRuleCreated(input.ruleId, input.trigger, input.target, input.threshold, input.metadataURI, input.enabled);
+        emit BadgeRuleCreated(
+            input.ruleId, input.trigger, input.target, input.threshold, input.metadataURI, input.enabled
+        );
     }
 
     function updateRule(uint256 ruleId, string calldata metadataURI) external onlyOwner {

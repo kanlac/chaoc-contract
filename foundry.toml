@@ -7,7 +7,7 @@ ffi = true
 fs_permissions = [
     { access = "read", path = "./" }
 ]
-gas_reports = ["IdentityToken", "ReputationBadge", "BadgeRuleRegistry"]
+gas_reports = ["IdentityToken", "ReputationBadge", "BadgeRuleRegistry", "Marketplace", "ReputationDataFeed"]
 
 [fmt]
 line_length = 120
