@@ -28,7 +28,7 @@
 - 事件：`BadgeRuleCreated`, `BadgeRuleUpdated`。
 
 ### Marketplace
-- 交易流程：`listWork(workId, price)`, `deactivateWork(workId)`, `purchase(workId, purchaseId)`（首次购买会为空投 `buyerWelcomeAmount` 数量的结算代币，再执行转账）。
+- 交易流程：`listWork(workId, price)`, `deactivateWork(workId)`, `purchase(workId)`（首次购买会为空投 `buyerWelcomeAmount` 数量的结算代币，再执行转账，同一买家对同一作品仅能成功一次）。
 - 徽章评估：`getEligibleRules(account, target)`, 后续阶段预留 `issueMonthlyBadges`。
 - 数据读取：`getWork`, `getBuyerStat`, `getCreatorStat`, `creatorRegistryLength`, `creatorAt`。
 - 配置：`setBadgeContract`, `setBadgeRuleRegistry`, `setDataFeed`, `setIdentityMetadataURI`, `setBuyerWelcomeAmount`。

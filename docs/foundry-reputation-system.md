@@ -30,8 +30,8 @@
 | `IdentityToken` (EIP-4973) | 为每个地址铸造唯一身份 NFT，标识社区成员。 |
 | `ReputationBadge` (EIP-5114) | 维护徽章元数据、颁发记录，禁止转移/销毁。 |
 | `BadgeRuleRegistry` | 链上存储徽章规则（阈值、触发类型、权重等）。部署时写入，可后续扩展。 |
-| `ReputationController` (abstract) | 提供内部函数 `_handlePurchase`、`_issueBadges`，供继承合约内部调用。 |
-| `Marketplace` | 作品上架、购买与结算的入口合约，是唯一暴露 `external` 接口的模块。内部调用 `_handlePurchase` 触发声誉逻辑，并写入链上统计，同时向新买家空投初始结算代币。 |
+| `ReputationController` (abstract) | 提供 `_ensureIdentity`、`_awardBadge` 等内部工具函数，供继承合约封装身份铸造与徽章颁发流程。 |
+| `Marketplace` | 作品上架、购买与结算的入口合约，是唯一暴露 `external` 接口的模块。内部维护累计统计、限制买家重复购买，并负责写入 `ReputationDataFeed` 及向新买家空投初始结算代币。 |
 | `ReputationDataFeed` | 接收 `Marketplace` 写入的累计数据，为主动徽章或外部查询提供聚合接口。 |
 
 > 说明：若交易功能由既有市场合约承担，可通过接口回调或事件监听调用 `ReputationController`。
@@ -51,7 +51,7 @@
   ```
 - `ReputationBadge` 存储 `badgeId => ruleId`、`account => badgeIds`。
 - 使用位图或 `mapping(address => mapping(uint256 => bool))` 避免重复颁发。
-- `Marketplace` 维护 `mapping(bytes32 => Work)`（作品基元）、`mapping(address => BuyerStat)`、`mapping(address => CreatorStat)`（买家/创作者累计数据）、`mapping(bytes32 => bool)`（`purchaseId` 去重）、`uint256 buyerWelcomeAmount`（新用户空投额度）等状态，并作为唯一写入 `ReputationDataFeed` 的合约。同时维护 `address[] creatorRegistry`（可分页枚举），便于链上遍历。`Work` 采用懒发布（Lazy Listing）模式：创作者离线签名作品数据，链上验签登记。
+- `Marketplace` 维护 `mapping(bytes32 => Work)`（作品基元）、`mapping(address => BuyerStat)`、`mapping(address => CreatorStat)`（买家/创作者累计数据）、`mapping(bytes32 => mapping(address => bool))`（买家是否已购买对应作品）、`uint256 buyerWelcomeAmount`（新用户空投额度）等状态，并作为唯一写入 `ReputationDataFeed` 的合约。同时维护 `address[] creatorRegistry`（可分页枚举），便于链上遍历。`Work` 采用懒发布（Lazy Listing）模式：创作者离线签名作品数据，链上验签登记。
 - 事件：`IdentityMinted`, `BadgeRuleCreated`, `BadgeIssued(account, ruleId, badgeId)`。
 - 规则一经创建仅允许更新 `metadataURI` 或启用状态，如需调整阈值或触发对象应通过新规则替代。
 
@@ -74,10 +74,10 @@
 3. 身份 `tokenId` 一经生成即与地址绑定，无法转移。
 
 ### 7.2 被动徽章（交易触发）
-1. 买家调用 `Marketplace.purchase(workId)` 完成 USDT 结算；若买家尚无身份 NFT，流程开头会自动通过 `IdentityToken.attest` 铸造。
-2. 若买家从未消费过且配置了 `buyerWelcomeAmount`，合约会先调用结算代币的 `mint` 接口为空投初始余额，再执行 USDT 转账，并更新链上累计数据（次数、成交额），同时向 `ReputationDataFeed` 同步最新统计。
-3. 合约内部调用 `ReputationController._handlePurchase(buyer, creator, amount, purchaseId)`。
-4. `_handlePurchase` 基于最新累计数据判断是否满足规则 ID 1-5，合格时铸造徽章并记录状态，随后发出 `BadgeIssued` 事件。
+1. 买家调用 `Marketplace.purchase(workId)`，合约首先校验该地址是否已购买过此 `workId`，若已购买则直接 `revert`。
+2. 若买家尚无身份 NFT，流程开始会自动通过 `IdentityToken.attest` 铸造；首次消费且配置了 `buyerWelcomeAmount` 时，会先调用结算代币的 `mint` 接口为空投初始余额。
+3. 合约随后执行 USDT `transferFrom` 完成结算，更新 `listing.sold` 及买家/创作者的累计次数与成交额，并同步给 `ReputationDataFeed`。
+4. `_evaluatePassiveRules` 基于最新累计数据判断是否满足规则 ID 1-5，合格时铸造徽章并记录状态，同时触发 `BadgeIssued` 与 `PurchaseCompleted` 事件。
 
 ### 7.3 主动徽章（批处理触发）
 **第一阶段（链上列表迭代）**
@@ -114,15 +114,16 @@ chaoc-contract/
 ## 9. 核心接口示例
 ```solidity
 abstract contract ReputationController {
-    function _handlePurchase(address buyer, address creator, uint256 amount, bytes32 purchaseId) internal;
-    function _issueBadges(uint256 ruleId, address[] memory accounts) internal;
-    function _eligibleRules(address account, BadgeTarget target) internal view returns (uint256[] memory);
+    function _ensureIdentity(address account, string memory metadataURI) internal;
+    function _awardBadge(address account, BadgeRuleRegistry.BadgeRule memory rule) internal;
+    function _setBadgeContract(ReputationBadge newBadge) internal;
+    function _setBadgeRuleRegistry(BadgeRuleRegistry newRegistry) internal;
 }
 
 contract Marketplace is ReputationController, Ownable {
     function listWork(bytes32 workId, uint256 price) external;
     function deactivateWork(bytes32 workId) external;
-    function purchase(bytes32 workId, bytes32 purchaseId) external;
+    function purchase(bytes32 workId) external;
     function getEligibleRules(address account, BadgeTarget target) external view returns (uint256[] memory);
     function setBadgeContract(ReputationBadge newBadge) external onlyOwner;
     function setBadgeRuleRegistry(BadgeRuleRegistry newRegistry) external onlyOwner;
@@ -137,8 +138,8 @@ contract Marketplace is ReputationController, Ownable {
 
 - `listWork` 现阶段直接由创作者调用登记作品（后续可替换为 EIP-712 验签流程），记录 `creator`、`price`、`active`、累计销量等字段。
 - `deactivateWork` 由创作者或运营者（合约 `owner`）调用，将 `Work.active` 置为 `false`，禁止后续购买；同时可选择从 `creatorRegistry` 中保留记录以便统计历史绩效。
-- `purchaseId` 用于去重；由调用方生成并传入，合约会拒绝重复的 `purchaseId`，防止脚本重复播报。
-- `purchase` 仅支持 USDT 结算，在入场时自动调用 `IdentityToken.attest` 为买家铸造身份 NFT（若尚未存在），随后更新 `BuyerStat`/`CreatorStat`、同步 `ReputationDataFeed`，并调用 `_handlePurchase`。合约直接使用 `Work` 中登记的价格执行结算。
+- `purchase` 内部使用 `_hasPurchased[workId][buyer]` 限制同一买家对同一作品仅能成交一次。
+- `purchase` 仅支持 USDT 结算，在入场时自动调用 `IdentityToken.attest` 为买家铸造身份 NFT（若尚未存在），随后更新 `BuyerStat`/`CreatorStat`、同步 `ReputationDataFeed`，并基于 `_evaluatePassiveRules` 铸造被动徽章。合约直接使用 `Work` 中登记的价格执行结算。
 - `getEligibleRules` 对外提供只读查询，返回满足阈值且尚未领取的规则 ID。
 - `issueMonthlyBadges` 采用链上分页遍历，消除对外部 `accounts[]` 名单的依赖；第二阶段可切换到 Merkle 证明接口。
 
@@ -164,7 +165,7 @@ contract Marketplace is ReputationController, Ownable {
   - `ReputationController`：被动/主动触发路径，冲突与去重。
   - `Marketplace`：作品上架、购买结算、权限与累计统计、写入 `ReputationDataFeed`。
 - 集成测试：
-  - 模拟 `Marketplace` 处理购买并触发 `_handlePurchase`。
+  - 模拟 `Marketplace` 处理购买并触发被动徽章发放。
   - 月度脚本模拟：分页调用 `Marketplace.issueMonthlyBadges` 完成链上遍历。
   - （第二阶段）Merkle 证明验证：为 `claimBadgeWithProof` 构造有效/无效证明。
 - 运行命令：

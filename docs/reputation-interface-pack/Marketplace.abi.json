@@ -316,11 +316,6 @@
         "name": "workId",
         "type": "bytes32",
         "internalType": "bytes32"
-      },
-      {
-        "name": "purchaseId",
-        "type": "bytes32",
-        "internalType": "bytes32"
       }
     ],
     "outputs": [],
@@ -491,12 +486,6 @@
         "internalType": "bytes32"
       },
       {
-        "name": "purchaseId",
-        "type": "bytes32",
-        "indexed": false,
-        "internalType": "bytes32"
-      },
-      {
         "name": "price",
         "type": "uint256",
         "indexed": false,
@@ -556,22 +545,12 @@
   },
   {
     "type": "error",
-    "name": "InvalidPurchaseId",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "NotWorkCreator",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "PurchaseAlreadyProcessed",
-    "inputs": []
-  },
-  {
-    "type": "error",
     "name": "WorkAlreadyActive",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "WorkNotFound",
     "inputs": []
   },
   {
@@ -581,7 +560,12 @@
   },
   {
     "type": "error",
-    "name": "WorkNotFound",
+    "name": "NotWorkCreator",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "AlreadyPurchased",
     "inputs": []
   }
 ]

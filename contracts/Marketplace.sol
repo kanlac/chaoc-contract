@@ -32,7 +32,7 @@ contract Marketplace is ReputationController {
     uint256 public buyerWelcomeAmount;
 
     mapping(bytes32 => Listing) private _works;
-    mapping(bytes32 => bool) private _processedPurchaseIds;
+    mapping(bytes32 => mapping(address => bool)) private _hasPurchased;
 
     mapping(address => BuyerStat) private _buyerStats;
     mapping(address => CreatorStat) private _creatorStats;
@@ -42,17 +42,14 @@ contract Marketplace is ReputationController {
 
     event WorkListed(bytes32 indexed workId, address indexed creator, uint256 price);
     event WorkDeactivated(bytes32 indexed workId, address indexed caller);
-    event PurchaseCompleted(
-        address indexed buyer, address indexed creator, bytes32 indexed workId, bytes32 purchaseId, uint256 price
-    );
+    event PurchaseCompleted(address indexed buyer, address indexed creator, bytes32 indexed workId, uint256 price);
 
     error InvalidPrice();
     error WorkAlreadyActive();
     error WorkNotFound();
     error WorkNotActive();
     error NotWorkCreator();
-    error InvalidPurchaseId();
-    error PurchaseAlreadyProcessed();
+    error AlreadyPurchased();
 
     constructor(
         IMintableERC20 token,
@@ -96,19 +93,16 @@ contract Marketplace is ReputationController {
         emit WorkDeactivated(workId, msg.sender);
     }
 
-    function purchase(bytes32 workId, bytes32 purchaseId) external {
-        if (purchaseId == bytes32(0)) revert InvalidPurchaseId();
-        if (_processedPurchaseIds[purchaseId]) revert PurchaseAlreadyProcessed();
-
+    function purchase(bytes32 workId) external {
         Listing storage listing = _works[workId];
         if (listing.creator == address(0)) revert WorkNotFound();
         if (!listing.active) revert WorkNotActive();
 
-        _processedPurchaseIds[purchaseId] = true;
-
         address buyer = msg.sender;
         address creator = listing.creator;
         uint256 price = listing.price;
+
+        if (_hasPurchased[workId][buyer]) revert AlreadyPurchased();
 
         BuyerStat storage buyerStat = _buyerStats[buyer];
         if (buyerStat.totalPurchases == 0 && buyerWelcomeAmount > 0) {
@@ -118,6 +112,7 @@ contract Marketplace is ReputationController {
         require(settlementToken.transferFrom(buyer, creator, price), "Marketplace: transfer failed");
 
         listing.sold += 1;
+        _hasPurchased[workId][buyer] = true;
 
         _ensureIdentity(buyer, identityMetadataURI);
 
@@ -152,7 +147,7 @@ contract Marketplace is ReputationController {
             );
         }
 
-        emit PurchaseCompleted(buyer, creator, workId, purchaseId, price);
+        emit PurchaseCompleted(buyer, creator, workId, price);
     }
 
     function getWork(bytes32 workId) external view returns (Listing memory) {

@@ -14,7 +14,6 @@ contract MarketplacePurchaseTest is BaseReputationTest {
     MockERC20 internal usdt;
 
     bytes32 internal constant WORK_ID = keccak256("work-1");
-    bytes32 internal constant PURCHASE_ID = keccak256("purchase-1");
     uint256 internal constant WELCOME_AMOUNT = 10_000_000;
 
     function setUp() public virtual override {
@@ -63,10 +62,10 @@ contract MarketplacePurchaseTest is BaseReputationTest {
         _approveBuyer(10_000_000);
 
         vm.expectEmit(true, true, true, true);
-        emit Marketplace.PurchaseCompleted(buyer, creator, WORK_ID, PURCHASE_ID, 10_000_000);
+        emit Marketplace.PurchaseCompleted(buyer, creator, WORK_ID, 10_000_000);
 
         vm.prank(buyer);
-        marketplace.purchase(WORK_ID, PURCHASE_ID);
+        marketplace.purchase(WORK_ID);
 
         assertTrue(identityToken.hasIdentity(buyer), "identity not minted");
         assertTrue(reputationBadge.hasBadge(buyer, 1), "buyer badge missing");
@@ -83,14 +82,14 @@ contract MarketplacePurchaseTest is BaseReputationTest {
         assertEq(creatorStat.totalVolume, 10_000_000, "creator volume mismatch");
     }
 
-    function testDuplicatePurchaseIdReverts() public {
+    function testDuplicatePurchaseReverts() public {
         _approveBuyer(10_000_000);
 
         vm.prank(buyer);
-        marketplace.purchase(WORK_ID, PURCHASE_ID);
+        marketplace.purchase(WORK_ID);
 
         vm.prank(buyer);
-        vm.expectRevert(Marketplace.PurchaseAlreadyProcessed.selector);
-        marketplace.purchase(WORK_ID, PURCHASE_ID);
+        vm.expectRevert(Marketplace.AlreadyPurchased.selector);
+        marketplace.purchase(WORK_ID);
     }
 }

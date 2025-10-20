@@ -16,7 +16,6 @@ contract AnvilSmokeTest is Script {
     uint256 internal constant WELCOME_AMOUNT = 10_000_000;
     uint256 internal constant LIST_PRICE = 6_000_000;
     bytes32 internal constant WORK_ID = keccak256("smoke-work");
-    bytes32 internal constant PURCHASE_ID = keccak256("smoke-purchase");
 
     function run() external {
         // Derive deterministic local accounts
@@ -85,7 +84,7 @@ contract AnvilSmokeTest is Script {
         // Buyer approves marketplace and purchases the work
         vm.startPrank(buyer);
         settlementToken.approve(address(marketplace), type(uint256).max);
-        marketplace.purchase(WORK_ID, PURCHASE_ID);
+        marketplace.purchase(WORK_ID);
         vm.stopPrank();
 
         // Assertions
