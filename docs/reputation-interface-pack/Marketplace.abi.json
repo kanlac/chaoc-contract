@@ -540,22 +540,12 @@
   },
   {
     "type": "error",
+    "name": "AlreadyPurchased",
+    "inputs": []
+  },
+  {
+    "type": "error",
     "name": "InvalidPrice",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "WorkAlreadyActive",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "WorkNotFound",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "WorkNotActive",
     "inputs": []
   },
   {
@@ -565,7 +555,17 @@
   },
   {
     "type": "error",
-    "name": "AlreadyPurchased",
+    "name": "WorkAlreadyActive",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "WorkNotActive",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "WorkNotFound",
     "inputs": []
   }
 ]

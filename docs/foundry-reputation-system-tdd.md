@@ -14,28 +14,30 @@
 - **工具链**：Foundry（推荐 `forge >= 0.2.0`）、`solc` 与 `anvil`。
 - **目录结构**（建议）：
   ```
-  contracts/
-  ├─ IdentityToken.sol
-  ├─ ReputationBadge.sol
-  ├─ BadgeRuleRegistry.sol
-  ├─ ReputationController.sol
-  ├─ Marketplace.sol
-  └─ ReputationDataFeed.sol
-  test/
-  ├─ identity/
-  │  └─ IdentityToken.t.sol
-  ├─ badge/
-  │  └─ ReputationBadge.t.sol
-  ├─ rules/
-  │  └─ BadgeRuleRegistry.t.sol
-  ├─ controller/
-  │  └─ ReputationController.t.sol
-  ├─ marketplace/
-  │  └─ Marketplace_Purchase.t.sol
-  └─ integration/
-     └─ Marketplace_IssueBadges.t.sol
-  lib/
-  script/
+  packages/
+    contracts/
+      src/
+        IdentityToken.sol
+        ReputationBadge.sol
+        BadgeRuleRegistry.sol
+        Marketplace.sol
+        ReputationDataFeed.sol
+      test/
+        identity/
+          IdentityToken.t.sol
+        badge/
+          ReputationBadge.t.sol
+        rules/
+          BadgeRuleRegistry.t.sol
+        marketplace/
+          Marketplace_Purchase.t.sol
+      script/
+      lib/
+    shared/
+  apps/
+    web/
+    api/
+  tooling/
   ```
 - **配置文件**：在 `foundry.toml` 中开启 `ffi = true`（如需外部脚本）、`gas_reports = ["Marketplace", "IdentityToken"]` 帮助监测成本。
 - **测试账户**：统一使用 `setUp()` 中的地址别名：`buyer`, `creator`, `operator` 等，便于阅读（如需新增权限可再扩展）。

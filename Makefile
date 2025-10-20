@@ -20,18 +20,18 @@ test-unit:
 	@$(FORGE) test
 
 test-marketplace:
-	@$(FORGE) test --match-path test/marketplace/Marketplace_Purchase.t.sol
+	@$(FORGE) test --match-path packages/contracts/test/marketplace/Marketplace_Purchase.t.sol
 
 fmt:
 	@$(FORGE) fmt
 
 build:
 	@$(FORGE) build
-	@$(FORGE) inspect contracts/IdentityToken.sol:IdentityToken abi --json > docs/reputation-interface-pack/IdentityToken.abi.json
-	@$(FORGE) inspect contracts/ReputationBadge.sol:ReputationBadge abi --json > docs/reputation-interface-pack/ReputationBadge.abi.json
-	@$(FORGE) inspect contracts/BadgeRuleRegistry.sol:BadgeRuleRegistry abi --json > docs/reputation-interface-pack/BadgeRuleRegistry.abi.json
-	@$(FORGE) inspect contracts/Marketplace.sol:Marketplace abi --json > docs/reputation-interface-pack/Marketplace.abi.json
-	@$(FORGE) inspect contracts/ReputationDataFeed.sol:ReputationDataFeed abi --json > docs/reputation-interface-pack/ReputationDataFeed.abi.json
+	@$(FORGE) inspect packages/contracts/src/IdentityToken.sol:IdentityToken abi --json > docs/reputation-interface-pack/IdentityToken.abi.json
+	@$(FORGE) inspect packages/contracts/src/ReputationBadge.sol:ReputationBadge abi --json > docs/reputation-interface-pack/ReputationBadge.abi.json
+	@$(FORGE) inspect packages/contracts/src/BadgeRuleRegistry.sol:BadgeRuleRegistry abi --json > docs/reputation-interface-pack/BadgeRuleRegistry.abi.json
+	@$(FORGE) inspect packages/contracts/src/Marketplace.sol:Marketplace abi --json > docs/reputation-interface-pack/Marketplace.abi.json
+	@$(FORGE) inspect packages/contracts/src/ReputationDataFeed.sol:ReputationDataFeed abi --json > docs/reputation-interface-pack/ReputationDataFeed.abi.json
 
 clean:
 	@$(FORGE) clean
@@ -43,7 +43,7 @@ deploy-sepolia:
 	@if [ -f .env ]; then set -a && . .env && set +a; fi; \
 	if [ -z "$$SEPOLIA_RPC_URL" ]; then echo "SEPOLIA_RPC_URL is not set"; exit 1; fi; \
 	if [ -z "$$PRIVATE_KEY" ]; then echo "PRIVATE_KEY is not set"; exit 1; fi; \
-	$(FORGE) script script/DeployReputation.s.sol \
+	$(FORGE) script packages/contracts/script/DeployReputation.s.sol \
 		--rpc-url "$$SEPOLIA_RPC_URL" \
 		--broadcast \
 		--slow \
@@ -51,4 +51,4 @@ deploy-sepolia:
 
 anvil-smoke:
 	@RPC_URL=$${ANVIL_RPC_URL:-http://127.0.0.1:8545}; \
-	$(FORGE) script script/AnvilSmokeTest.s.sol --fork-url $$RPC_URL
+	$(FORGE) script packages/contracts/script/AnvilSmokeTest.s.sol --fork-url $$RPC_URL
