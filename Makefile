@@ -3,7 +3,7 @@ SHELL := /bin/bash
 
 FORGE ?= forge
 
-.PHONY: help test-unit test-marketplace fmt clean build deps deploy-sepolia
+.PHONY: help test-unit test-marketplace fmt clean build deps deploy-sepolia anvil-smoke
 
 help:
 	@echo "Common tasks:"
@@ -14,6 +14,7 @@ help:
 	@echo "  make build         # compile contracts"
 	@echo "  make clean         # clean build artifacts"
 	@echo "  make deploy-sepolia # deploy contracts to Sepolia using env credentials"
+	@echo "  make anvil-smoke   # run local smoke test against anvil"
 
 test-unit:
 	@$(FORGE) test
@@ -42,3 +43,7 @@ deploy-sepolia:
 		--broadcast \
 		--slow \
 		--private-key "$$PRIVATE_KEY"
+
+anvil-smoke:
+	@RPC_URL=$${ANVIL_RPC_URL:-http://127.0.0.1:8545}; \
+	$(FORGE) script script/AnvilSmokeTest.s.sol --fork-url $$RPC_URL

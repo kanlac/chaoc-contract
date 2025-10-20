@@ -126,6 +126,9 @@ forge test --gas-report
 
 # 检查覆盖率并输出 lcov
 forge coverage --report lcov
+
+# 在本地 anvil 上跑端到端冒烟
+make anvil-smoke
 ```
 
 ## 10. 持续交付建议

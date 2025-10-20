@@ -22,7 +22,7 @@
 
 ## 阶段 4：全面集成、监控与发布准备
 - **目标**：巩固 CI/CD、覆盖率、监控与文档，使系统具备上线前的可验证性。
-- **关键任务**：在 CI 中固定执行 `forge test --gas-report`、`forge coverage --report lcov` 并设阈值；补充端到端测试（前端/脚本调用测试网合约）与回滚策略；整理治理流程与运营权限说明、ABI 包与操作手册；预演正式部署流程并输出验收清单；让 CI 统一调用 `Makefile`（如 `make ci`、`make deploy-preview`）减少脚本重复。
+- **关键任务**：在 CI 中固定执行 `forge test --gas-report`、`forge coverage --report lcov` 并设阈值；补充端到端测试（前端/脚本调用测试网合约）与回滚策略；整理治理流程与运营权限说明、ABI 包与操作手册；预演正式部署流程并输出验收清单；让 CI 统一调用 `Makefile`（如 `make ci`、`make deploy-preview`）减少脚本重复；在本地通过 `make anvil-smoke` 或等效脚本回归核心交易链路。
 - **验证方式**：CI 全绿且附带 gas/覆盖率报告；端到端脚本在测试网上重放核心业务；验收清单逐项对照完成。
 - **可交付物**：CI 配置与报告、Makefile 目标说明、监控与回滚方案、完整文档包、发布前审查记录。
 
