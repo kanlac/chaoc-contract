@@ -49,8 +49,12 @@ contract MarketplacePurchaseTest is BaseReputationTest {
 
         dataFeed.setMarketplace(address(marketplace));
 
+        assertFalse(identityToken.hasIdentity(creator), "creator identity should not exist before listing");
+
         vm.prank(creator);
         marketplace.listWork(WORK_ID, 10_000_000); // 10 USDT with 6 decimals
+
+        assertTrue(identityToken.hasIdentity(creator), "creator identity should be minted on listing");
     }
 
     function _approveBuyer(uint256 amount) internal {
